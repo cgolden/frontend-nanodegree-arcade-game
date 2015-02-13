@@ -23,7 +23,12 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime,
+        /* I could never retrieve the character width and height, so
+         * I played around with values until I found something suitable.
+         */
+        charWidth = 60,
+        charHeight = 60;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -57,7 +62,7 @@ var Engine = (function(global) {
          * function again as soon as the browser is able to draw another frame.
          */
         win.requestAnimationFrame(main);
-    };
+    }
 
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
@@ -80,7 +85,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function  and loops through all of the
@@ -94,7 +99,24 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
-        player.update();
+        /* I am using the player.update function to reset the position.
+         * That is why I've commented it here and moved it to checkCollisions.
+         * The update may be modified to do other things later (scoring, etc.).
+         * In that case, I guess I could create a different function for the player
+         * reset and use the update for something else.
+         */
+        //player.update();
+    }
+
+    function checkCollisions() {   
+        allEnemies.forEach(function(enemy) {
+            if ((player.x + charWidth) >= enemy.x &&
+                player.x <= (enemy.x + charWidth) &&
+                (player.y + charHeight) >= enemy.y &&
+                player.y <= (enemy.y + charHeight)) {
+                    player.update();
+            }   
+        });  
     }
 
     /* This function initially draws the "game level", it will then call
@@ -172,7 +194,12 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        /* You wouldn't believe how long I banged my head against the wall
+         * until a forum response reminded me that I hadn't loaded the image
+         * that I planned to use for my player.
+         */
+        'images/char-princess-girl.png'
     ]);
     Resources.onReady(init);
 
